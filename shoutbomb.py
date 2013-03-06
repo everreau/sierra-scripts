@@ -5,21 +5,18 @@
 
 import os
 import psycopg2
-import paramiko
 
 from datetime import date
+from ftplib import  FTP_TLS
 
-# Shoutbomb wants blank fields not 'None'
 def strify(obj):
     if obj == None:
         return ''
     else:
         return str(obj)
         
-def write_file(cursor, name, title_row, query):
-    # move old files
-    os.system("mv %s*.txt archive/" % name)
-    filename = ("%s%s.txt" % (name, date.today(),))
+def write_file(cursor, filename_template, title_row, query):
+    filename = (filename_template % (date.today().strftime('%m%d%y'),))
     try:
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -27,34 +24,32 @@ def write_file(cursor, name, title_row, query):
         f = open(filename, "w")
     
         f.write(title_row)
+        f.write("\n")
 
         for r in rows:
-            # strify in case we get back some numbers
             f.write("|".join(map(strify, r)))
             f.write("\n")
 
         f.close()
     except:
-        # if we fail don't return a file name
         return None
     return filename
 
 
-def put_file(sftp, filename):
+def put_file(sftp, filename, directory):
     if filename != None:
-        # name depends on your destination
-        sftp.put(filename, ("/usr/home/spl/shoutbomb/%s" % filename))
+        f = open(filename, 'rb')
+        sftp.storbinary(("STOR /%s/%s" % (directory, filename,)), f)
+        f.close()
 
 try:
-    # insert your user, host, password
-    conn = psycopg2.connect("dbname='iii' user='' host='' port='1032' password='' sslmode='require'")
+    conn = psycopg2.connect("dbname='iii' user='<db-user>' host='<sierra-db>' port='1032' password='<sierra-password>' sslmode='require'")
 except psycopg2.Error as e:
     print "Unable to connect to database: " + unicode(e)
 
 cursor = conn.cursor()
 
 holds_titles = "title|last_update|item_no|patron_no|pickup_location"
-# ILL titles are in varfield but normal titles in subfield.
 holds_q = """SELECT TRIM(TRAILING '/' from COALESCE(s.content, v.field_content)), 
              to_char(rmi.record_last_updated_gmt,'MM-DD-YYYY') AS last_update, 
              'i' || rmi.record_num || 'a' AS item_no, 
@@ -92,7 +87,7 @@ overdues_q =  """SELECT 'p' || rmp.record_num || 'a' AS patron_no,
   LEFT JOIN sierra_view.hold as bh ON (bh.record_id = bil.bib_record_id) 
   LEFT JOIN sierra_view.hold as ih ON (ih.record_id = i.id and ih.status = '0') 
   LEFT JOIN sierra_view.record_metadata as rmb ON (rmb.id = bil.bib_record_id AND rmb.record_type_code = 'b') 
-  WHERE (current_date - c.due_gmt::date) = 7 
+  WHERE (current_date - c.due_gmt::date) = %i 
   GROUP BY 1,2,3,4,5,6,7,10,11 
   ORDER BY patron_no"""
 
@@ -120,23 +115,27 @@ renewals_q = """SELECT 'p' || rmp.record_num || 'a' AS patron_no,
   LEFT JOIN sierra_view.hold as bh ON (bh.record_id = bil.bib_record_id) 
   LEFT JOIN sierra_view.hold as ih ON (ih.record_id = i.id and ih.status = '0')         
   LEFT JOIN sierra_view.record_metadata as rmb ON (rmb.id = bil.bib_record_id AND rmb.record_type_code = 'b')
-  WHERE (c.due_gmt::date - current_date) = 1
+  WHERE (c.due_gmt::date - current_date) = 2
   GROUP BY 1,2,3,4,5,6,7,10,11
   ORDER BY patron_no"""
 
-holds_file = write_file(cursor, "holds", holds_titles, holds_q)
-overdues_file = write_file(cursor, "overdues", overdues_titles, overdues_q)
-renewals_file = write_file(cursor, "renewals", renewals_titles, overdues_q)
+os.system("mv holds*.txt archive/")
+os.system("mv overdue*.txt archive/")
+os.system("mv renew*.txt archive/")
 
-ssh = paramiko.SSHClient() 
-ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
-# insert shoutbomb server, your username, password
-ssh.connect("", username="", password="")
-sftp = ssh.open_sftp()
+holds_file = write_file(cursor, "holds%s.txt", holds_titles, holds_q)
+overdue_files = []
+for week in range(1, 8):
+    overdue_files.append(write_file(cursor, ("overdue%s_" + unicode(week) + ".txt"), overdues_titles, (overdues_q % (week * 7))))
+renewals_file = write_file(cursor, "renew%s.txt", renewals_titles, renewals_q)
 
-put_file(sftp, holds_file)
-put_file(sftp, overdues_file)
-put_file(sftp, renewals_file)
+sftp = FTP_TLS('<shoutbomb-host>', '<shoutbomb-user>', '<shoutbomb-password>')
+sftp.login('<shoutbomb-user>', '<shoutbomb-password>')
+sftp.prot_p()
 
-sftp.close()
-ssh.close()
+put_file(sftp, holds_file, "/Holds/")
+for f in overdue_files:
+    put_file(sftp, f, "/Overdue/")
+put_file(sftp, renewals_file, "/Renew/")
+
+sftp.quit()
