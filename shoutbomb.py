@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 #
-# Script to export holds from Sierra and send them to shoutbomb
+# Script to export holds, overdues and renewals from Sierra and send them to shoutbomb
+# with Thanks to Gerri Moeller from OWLS
 #
 
 import os
