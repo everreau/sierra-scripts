@@ -1,7 +1,6 @@
-#!/usr/bin/python2.7
+#!/usr/local/bin/python2.7
 #
-# Script to export holds, overdues and renewals from Sierra and send them to shoutbomb
-# with Thanks to Gerri Moeller from OWLS
+# Script to export holds from Sierra and send them to shoutbomb
 #
 
 import os
@@ -9,6 +8,8 @@ import psycopg2
 
 from datetime import date
 from ftplib import  FTP_TLS
+
+from settings import *
 
 def strify(obj):
     if obj == None:
@@ -38,13 +39,17 @@ def write_file(cursor, filename_template, title_row, query):
 
 
 def put_file(sftp, filename, directory):
-    if filename != None:
-        f = open(filename, 'rb')
-        sftp.storbinary(("STOR /%s/%s" % (directory, filename,)), f)
-        f.close()
+    try:
+        if filename != None:
+            print "sending " + filename
+            f = open(filename, 'rb')
+            sftp.storbinary(("STOR /%s/%s" % (directory, filename,)), f)
+            f.close()
+    except Exception, e:
+        print e
 
 try:
-    conn = psycopg2.connect("dbname='iii' user='<db-user>' host='<sierra-db>' port='1032' password='<sierra-password>' sslmode='require'")
+    conn = psycopg2.connect("dbname='%s' user='%s' host='%s' port='1032' password='%s' sslmode='require'" % (DB_NAME, DB_USER, DB_HOST, DB_PASSWORD,))
 except psycopg2.Error as e:
     print "Unable to connect to database: " + unicode(e)
 
@@ -120,24 +125,31 @@ renewals_q = """SELECT 'p' || rmp.record_num || 'a' AS patron_no,
   GROUP BY 1,2,3,4,5,6,7,10,11
   ORDER BY patron_no"""
 
-os.chdir("<my-dir>")
+os.chdir("/usr/home/spl/shoutbomb/")
 os.system("mv holds*.txt archive/")
 os.system("mv overdue*.txt archive/")
 os.system("mv renew*.txt archive/")
 
 holds_file = write_file(cursor, "holds%s.txt", holds_titles, holds_q)
+print ("created %s" % holds_file)
 overdue_files = []
 for week in range(1, 8):
-    overdue_files.append(write_file(cursor, ("overdue%s_" + unicode(week) + ".txt"), overdues_titles, (overdues_q % (week * 7))))
+    overdue_file = write_file(cursor, ("overdue%s_" + unicode(week) + ".txt"), overdues_titles, (overdues_q % (week * 7)))
+    overdue_files.append(overdue_file)    
+    print ("created %s" % overdue_file)
 renewals_file = write_file(cursor, "renew%s.txt", renewals_titles, renewals_q)
+print ("created %s" % renewals_file)
 
-sftp = FTP_TLS('<shoutbomb-host>', '<shoutbomb-user>', '<shoutbomb-password>')
-sftp.login('<shoutbomb-user>', '<shoutbomb-password>')
-sftp.prot_p()
+try:
+    sftp = FTP_TLS(FTP_HOST, FTP_USER, FTP_PASSWORD)
+    sftp.login(FTP_USER, FTP_PASSWORD)
+    sftp.prot_p()
 
-put_file(sftp, holds_file, "/Holds/")
-for f in overdue_files:
-    put_file(sftp, f, "/Overdue/")
-put_file(sftp, renewals_file, "/Renew/")
+    put_file(sftp, holds_file, "/Holds/")
+    for f in overdue_files:
+        put_file(sftp, f, "/Overdue/")
+    put_file(sftp, renewals_file, "/Renew/")
 
-sftp.quit()
+    sftp.quit()
+except Exception, e:
+    print e
