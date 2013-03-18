@@ -1,1 +1,6 @@
 *~
+*.pyc
+.DS_Store
+*.json
+settings.py
+*.csv
