@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us">
+<head>
+<title>Recently Returned Books</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+
+<!--
+  jQuery library
+-->
+<script type="text/javascript" src="lib/jquery-1.4.2.js"></script>
+
+<!--
+  jCarousel library
+-->
+<script type="text/javascript" src="lib/jquery.jcarousel.js"></script>
+
+<!--
+  jCarousel skin stylesheet
+-->
+<link rel="stylesheet" type="text/css" href="skins/ie7/skin.css" />
+
+<script type="text/javascript">
+
+
+function mycarousel_initCallback(carousel, state)
+{
+  carousel.buttonNext.bind('click', function() { carousel.startAuto(0);});
+  carousel.buttonPrev.bind('click', function() { carousel.startAuto(0);});
+
+  carousel.clip.hover(function() { carousel.stopAuto(); }, function() { carousel.startAuto(); });
+	
+  $("#json").change(function(evt){
+      carousel.reset();
+      carousel.reload();
+  });
+};
+
+function mycarousel_itemLoadCallback(carousel, state)
+{
+    $.getJSON($("#json").val(), function(data){
+      for (i = 0; i < data.length; i++) {
+        carousel.add(i+1, mycarousel_getItemHTML(data[i]));
+      }
+      carousel.size(data.length)
+    });
+};
+
+/**
+ * Item html creation helper.
+ */
+function mycarousel_getItemHTML(item)
+{
+    return '<a href="' + item.link + '" target="_blank"><img src="' + item.img_link + '" alt="' + item.title + '" onload="setSize(this)"/></a>';
+};
+
+function setSize(img)
+{
+  img.height = 200;
+  img.width = 133;
+};
+
+jQuery(document).ready(function() {
+    jQuery('#mycarousel').jcarousel({
+        auto: 2,
+        wrap: 'last',
+	itemLoadCallback: mycarousel_itemLoadCallback,
+	initCallback: mycarousel_initCallback
+    });
+});
+
+</script>
+</head>
+<body>
+<div id="wrap">
+  <h1>Recently Returned Items</h1>
+  <div id="mycarousel" class="jcarousel-skin-ie7">
+    <p>
+      <select id="json">
+        <option value="af.json" selected>Adult Fiction</option>
+        <option value="yf.json">Youth Fiction</option>
+        <option value="advd.json">Adult DVD</option>
+      </select>
+    </p>
+    <br>
+    <ul>
+      <!-- The content will be dynamically loaded in here -->
+    </ul>
+  </div>
+</div>
+</body>
+</html>
