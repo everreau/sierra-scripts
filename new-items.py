@@ -25,7 +25,7 @@ cursor = conn.cursor()
 os.chdir(os.getcwd())
 
 for filename in isbn_qs:
-    do_it(cursor, filename, base_isbn_q % isbn_qs[filename])
+    do_it(cursor, filename, base_isbn_q % tuple(isbn_qs[filename]))
 
 for filename in upc_qs:
     do_it(cursor, filename, base_upc_q % upc_qs[filename])
