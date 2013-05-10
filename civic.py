@@ -17,11 +17,11 @@ from settings import *
 
 def strify(obj):
     if obj == None:
-        return ''
+        return '\"\"'
     else:
-        return str(obj)
+        return "\"%s\"" % str(obj)
 
-title_row = "RECORD #(PATRON), OUT DATE,LOCATION,MAT TYPE,OUT LOC,RECORD #(ITEM),CALL #(BIBLIO),OCLC #,RECORD #(BIBLIO),LCCN,LANG"
+title_row = "\"RECORD #(PATRON)\",\"OUT DATE\",\"LOCATION\",\"MAT TYPE\",\"OUT LOC,RECORD #(ITEM)\",\"CALL #(BIBLIO)\",\"OCLC #\",\"RECORD #(BIBLIO)\",\"LCCN\",\"LANG\""
 q = """SELECT 'p' || rmp.record_num || 'a' as patron_record_num, 
        to_char(c.checkout_gmt,'MM-DD-YYYY HH:MI') as checkout_date, 
        i.location_code as item_location, 
@@ -74,8 +74,8 @@ f.close()
 SUBJECT = "Civic Technologies Checkout Data File"
 
 msg = MIMEMultipart()
-msg["From"] = EMAIL_FROM
-msg["To"] = EMAIL_TO
+msg["From"] = "everreau@skokielibrary.info"
+msg["To"] = "gshaw@skokielibrary.info"
 msg["Subject"] = SUBJECT
 msg["Date"] = formatdate(localtime=True)
 
@@ -88,7 +88,7 @@ msg.attach(part)
 server = smtplib.SMTP(EMAIL_HOST)
 
 try:
-    failed = server.sendmail(EMAIL_FROM, EMAIL_TO, msg.as_string())
+    failed = server.sendmail(msg["From"], msg["To"], msg.as_string())
     server.close()
 except Exception, e:
     msg = "Unable to send email. Error: %s" % str(e)

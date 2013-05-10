@@ -11,15 +11,17 @@ from queries import *
 
 def read_summary(url):
     summary = ""
-    f = urllib2.urlopen(url)
-    xml = f.read()
-    f.close()
     try:
+        f = urllib2.urlopen(url % "xml")
+        xml = f.read()
+        f.close()
         root = ET.fromstring(xml)
         for i in root.iter("Fld520"):
-            summary = i[0].text[:500]
-            if len(i[0].text) > 500:
-                summary += ("... <a href='%s'>read more</a>" % url)
+            summary = i[0].text[:480]
+            if len(i[0].text) > 480:
+                last_space = summary.rfind(" ")
+                summary = summary[:last_space]
+                summary += ("... <a href='%s'>read more</a>" % (url % "html"))
     except:
         pass
     return summary
@@ -27,13 +29,14 @@ def read_summary(url):
 def get_summary(isbn, upc):
     summary = ""
     if isbn != None:
-        summary = read_summary("http://www.syndetics.com/index.aspx?isbn=%s/summary.xml&client=skopl" % isbn)
+        summary = read_summary("http://www.syndetics.com/index.aspx?isbn=" + unicode(isbn) + "/summary.%s&client=skopl")
     if len(summary) < 1 and upc != None:
-        summary = read_summary("http://plus.syndetics.com/index.php?isbn=/avsummary.xml&client=skopl&upc=%s" % upc)
+        summary = read_summary("http://plus.syndetics.com/index.php?isbn=/avsummary.%s&client=skopl&upc=" + unicode(upc))
     return summary
 
 def test_img_url(url):
     try:
+        print url
         imgstr = urllib2.urlopen(url).read()
         if len(imgstr) > 100:
             return url
@@ -50,6 +53,7 @@ def image_url(isbn, upc):
     return img_link
 
 def write_rss(cursor, filename, title, q):
+    print title
     cursor.execute(q)
     rows = cursor.fetchall()
 
@@ -66,7 +70,6 @@ def write_rss(cursor, filename, title, q):
             title = "%s / %s" % (r[1], r[2]) if r[2] and len(r[2]) > 0 else r[1],
             link = "http://encore.skokielibrary.info/iii/encore/record/C__Rb%s" % r[0],
             description = """<p><img src="%s" align="left" style="margin: 5px;">%s</p>""" % (image_url(r[3], r[4]), get_summary(r[3], r[4]),),
-            guid = PyRSS2Gen.Guid(r[3])
             )
           rss.items.append(item)
 
@@ -83,13 +86,7 @@ cursor = conn.cursor()
 
 os.chdir(os.getcwd())
 
-for filename in isbn_info:
-    info = isbn_info[filename]
-    p = isbn_qs[filename]
-    p.insert(1, info['days'])
-    q = (base_feed_q % tuple(p))
-    write_rss(cursor, filename, info['title'], q)
+for f in feeds:
+    feed = feeds[f]
+    write_rss(cursor, f, feed['title'], base_feed_q % ((joins[f] if f in joins else ""), feed['days'], where[f]))
 
-for filename in upc_info:
-    info = upc_info[filename]
-    write_rss(cursor, filename, info['title'], base_feed_q % ("", info['days'], upc_qs[filename],))

@@ -24,8 +24,5 @@ cursor = conn.cursor()
 
 os.chdir(os.getcwd())
 
-for filename in isbn_qs:
-    do_it(cursor, filename, base_isbn_q % tuple(isbn_qs[filename]))
-
-for filename in upc_qs:
-    do_it(cursor, filename, base_upc_q % upc_qs[filename])
+for s in encore_searches:
+    do_it(cursor, s, encore_searches[s] % ((joins[s] if s in joins else ""), where[s],))
