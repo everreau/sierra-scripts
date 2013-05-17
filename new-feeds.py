@@ -9,6 +9,12 @@ import urllib2
 from settings import *
 from queries import *
 
+def trim_summary(summary, url):
+    last_space = summary.rfind(" ", 498)
+    if last_space > -1:
+        return summary[:last_space] + ("... <a href='%s'>read more</a>" % url)
+    return summary
+
 def read_summary(url):
     summary = ""
     try:
@@ -17,11 +23,7 @@ def read_summary(url):
         f.close()
         root = ET.fromstring(xml)
         for i in root.iter("Fld520"):
-            summary = i[0].text[:480]
-            if len(i[0].text) > 480:
-                last_space = summary.rfind(" ")
-                summary = summary[:last_space]
-                summary += ("... <a href='%s'>read more</a>" % (url % "html"))
+            summary = trim_summary(i[0].text, (url % "html"))
     except:
         pass
     return summary
@@ -66,12 +68,13 @@ def write_rss(cursor, filename, title, q):
         items = [])
 
     for r in rows:
-          item = PyRSS2Gen.RSSItem(
+        link = "http://encore.skokielibrary.info/iii/encore/record/C__Rb%s" % r[0]
+        item = PyRSS2Gen.RSSItem(
             title = "%s / %s" % (r[1], r[2]) if r[2] and len(r[2]) > 0 else r[1],
-            link = "http://encore.skokielibrary.info/iii/encore/record/C__Rb%s" % r[0],
-            description = """<p><img src="%s" align="left" style="margin: 5px;">%s</p>""" % (image_url(r[3], r[4]), get_summary(r[3], r[4]),),
+            link = link,
+            description = """<p><img src="%s" align="left" style="margin: 5px;">%s</p>""" % (image_url(r[3], r[4]), trim_summary(r[5], link) if r[5] else get_summary(r[3], r[4]),),
             )
-          rss.items.append(item)
+        rss.items.append(item)
 
     f = open("%s.xml" % filename, "w")
     rss.write_xml(f, encoding='utf-8')
@@ -84,7 +87,8 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
-os.chdir(os.getcwd())
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 for f in feeds:
     feed = feeds[f]
