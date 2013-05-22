@@ -55,6 +55,8 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 filename = ("skokie_checkoutdatafile_%s.csv" % datetime.date.today())
 
 cursor.execute(q)
