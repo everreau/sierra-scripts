@@ -21,7 +21,7 @@ def strify(obj):
     else:
         return "\"%s\"" % str(obj)
 
-title_row = "\"RECORD #(PATRON)\",\"OUT DATE\",\"LOCATION\",\"MAT TYPE\",\"OUT LOC,RECORD #(ITEM)\",\"CALL #(BIBLIO)\",\"OCLC #\",\"RECORD #(BIBLIO)\",\"LCCN\",\"LANG\""
+title_row = "\"RECORD #(PATRON)\",\"OUT DATE\",\"LOCATION\",\"MAT TYPE\",\"OUT LOC\",\"RECORD #(ITEM)\",\"CALL #(BIBLIO)\",\"OCLC #\",\"RECORD #(BIBLIO)\",\"LCCN\",\"LANG\""
 q = """SELECT 'p' || rmp.record_num || 'a' as patron_record_num, 
        to_char(c.checkout_gmt,'MM-DD-YYYY HH:MI') as checkout_date, 
        i.location_code as item_location, 
