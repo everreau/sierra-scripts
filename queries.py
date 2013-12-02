@@ -6,7 +6,7 @@ LEFT JOIN sierra_view.item_record AS i ON (bil.item_record_id = i.record_id)
 JOIN sierra_view.subfield AS isbn ON (isbn.record_id = bil.bib_record_id AND isbn.marc_tag = '020') 
 LEFT JOIN sierra_view.subfield as d ON (b.record_id = d.record_id AND (d.marc_tag = '260' OR d.marc_tag = '264') and d.tag = 'c')
 %s
-WHERE d.content SIMILAR TO '%%201(3|2)%%' AND %s
+WHERE d.content SIMILAR TO '%%201(3|4)%%' AND %s
 GROUP BY rmb.record_num ORDER BY rmb.record_num DESC LIMIT 20"""
 
 base_upc_q = """SELECT MAX(upc.content) as upc
@@ -17,7 +17,7 @@ LEFT JOIN sierra_view.item_record AS i ON (bil.item_record_id = i.record_id)
 JOIN sierra_view.subfield AS upc ON (upc.record_id = bil.bib_record_id AND upc.marc_tag = '024' AND tag = 'a') 
 LEFT JOIN sierra_view.subfield as d ON (b.record_id = d.record_id AND (d.marc_tag = '260' OR d.marc_tag = '264') and d.tag = 'c') 
 %s
-WHERE d.content SIMILAR TO '%%201(3|2)%%' AND %s
+WHERE d.content SIMILAR TO '%%201(3|4)%%' AND %s
 GROUP BY rmb.record_num ORDER BY rmb.record_num DESC LIMIT 20"""
 
 base_feed_q = """SELECT rmb.record_num as bib_num, brp.best_title as title, brp.best_author as author, MAX(isbn.content) as isbn, MAX(upc.content) as upc, summary.content as summary, cataloging_date_gmt 
@@ -31,7 +31,7 @@ LEFT JOIN sierra_view.subfield as d ON (b.record_id = d.record_id AND (d.marc_ta
 LEFT JOIN sierra_view.bib_record_property AS brp ON (b.record_id = brp.bib_record_id)
 LEFT JOIN sierra_view.subfield as summary ON (b.record_id = summary.record_id AND summary.marc_tag = '520' AND summary.tag = 'a') 
 %s
-WHERE (current_date - cataloging_date_gmt::date) < %i AND d.content SIMILAR TO '%%201(3|2)%%' AND %s 
+WHERE (current_date - cataloging_date_gmt::date) < %i AND d.content SIMILAR TO '%%201(3|4)%%' AND %s 
 GROUP BY cataloging_date_gmt, rmb.record_num, brp.best_title, brp.best_author, summary.content ORDER BY cataloging_date_gmt DESC"""
 
 call_number = """LEFT JOIN sierra_view.subfield as c ON (b.record_id = c.record_id AND (c.marc_tag = '092') and c.tag = 'a')"""
