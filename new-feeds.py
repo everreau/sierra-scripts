@@ -87,7 +87,6 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
-
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 for f in feeds:
