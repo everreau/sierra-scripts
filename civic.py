@@ -57,7 +57,7 @@ cursor = conn.cursor()
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-filename = ("skokie_checkoutdatafile_%s.csv" % datetime.date.today())
+filename = ("skokie_checkouts_%s.csv" % datetime.date.today().strftime("%Y%m%d"))
 
 cursor.execute(q)
 rows = cursor.fetchall()
