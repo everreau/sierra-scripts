@@ -71,7 +71,7 @@ where = { "adult-audiobooks": """(i.location_code = 'acdf' OR i.location_code = 
           "adult-cds": "language_code = 'eng' AND i.location_code = 'acd'",
           "computer-books" :"""i.location_code = 'ancp'""",          
           "adult-dvds": "language_code = 'eng' AND (i.location_code LIKE 'advd%' OR i.location_code LIKE 'abd%')",          
-          "adult-feature-dvds": "language_code = 'eng' AND (i.location_code LIKE '%advdf%' OR i.location_code LIKE '%abdf%'",
+          "adult-feature-dvds": "language_code = 'eng' AND (i.location_code LIKE '%advdf%' OR i.location_code LIKE '%abdf%')",
           "adult-fiction-audiobooks": "i.location_code LIKE '%acdf%'",
           "adult-fiction": """i.location_code = 'afnw' AND c.content LIKE 'FICTION%'""",
           "adult-graphic-novels": "i.location_code = 'anfg'",
