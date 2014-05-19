@@ -1,3 +1,14 @@
+#!/usr/bin/python2.7
+#
+# Export enhanced new item rss feeds that include images and descriptions
+#
+# queries.py contains query bases and special clauses that are also used to create new item searches
+# for a variety of item types and categories
+#
+# results must be written somewhere web accessible for now http://artemis.skokielibrary.info/new-feeds/*.xml
+# these are not currently used anywhere but they could be!
+#
+
 import psycopg2
 import PyRSS2Gen
 import xml.etree.ElementTree as ET

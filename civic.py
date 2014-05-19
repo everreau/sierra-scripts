@@ -1,5 +1,8 @@
 #!/usr/bin/python2.7
 #
+# Export information about daily checkouts as required by Civic Technologies and send to contact person
+#
+#
 
 import psycopg2
 import datetime

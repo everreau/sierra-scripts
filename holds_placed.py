@@ -1,5 +1,10 @@
 #!/usr/bin/python2.7
 #
+# Send emails to everyone who placed a hold since the last time this script ran
+# We've decommissioned this script for now because we are now able to customize 
+# the message that appears in encore after a hold is placed.
+#
+#
 
 import psycopg2
 import smtplib
@@ -15,7 +20,7 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
-f = open("/usr/home/spl/holds_notices/last_holds_timestamp.txt", "r")
+f = open("last_holds_timestamp.txt", "r")
 last_timestamp = f.read()
 f.close()
 
@@ -60,7 +65,7 @@ for r in rows:
         else:
             emails[r[2]] = [(r[3].strip(" :/."), r[0],)]
 
-f = open("/usr/home/spl/holds_notices/last_holds_timestamp.txt", "w")
+f = open("last_holds_timestamp.txt", "w")
 f.write(unicode(last_timestamp))
 f.close()
 

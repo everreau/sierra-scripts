@@ -1,5 +1,11 @@
 #!/usr/bin/python2.7
 #
+# Create rss feed of items recently returned to the library
+# Not currently used.  There was an idea a while back to create a catalog computer
+# screen saver of recently returned items to give people ideas of things they could
+# check out right now.  This is the first piece of that project.
+#
+#
 
 import psycopg2
 import urllib2

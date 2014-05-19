@@ -1,5 +1,11 @@
 #!/usr/bin/python2.7
 #
+# Collect number of patrons at max holds and who those patrons are
+#
+# We used this script temporarily to determine if it made sense to raise the holds limit
+# Not currently in use
+#
+#
 
 import psycopg2
 

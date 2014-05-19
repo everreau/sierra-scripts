@@ -1,6 +1,6 @@
 #!/usr/local/bin/python2.7
 #
-# Script to export holds from Sierra and send them to shoutbomb
+# Script to export holds, overdues and courtesy notices from Sierra and send them to shoutbomb
 # Queries based on those from Gerri Moeller at OWLS
 #
 

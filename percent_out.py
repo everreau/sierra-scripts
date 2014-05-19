@@ -1,3 +1,10 @@
+#!/usr/bin/python2.7
+#
+# Export total items and items checked out in each location of the library at the time the script is run
+# Not currently run on a schedule but periodically run manually when requested
+#
+#
+
 import psycopg2
 
 from settings import *

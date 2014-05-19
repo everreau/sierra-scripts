@@ -1,3 +1,11 @@
+#!/usr/bin/python2.7
+#
+# Export text files of '|' separated ISBNs that are used create the new items searches at http://discover.skokielibrary.info
+#
+# queries.py contains query bases and special clauses that are also used to create new item rss feeds
+# results must be written somewhere web accessible for now http://artemis.skokielibrary.info/new-feeds/*.txt
+#
+
 import psycopg2
 import re, os
 
