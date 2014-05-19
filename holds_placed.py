@@ -46,37 +46,41 @@ WHERE NOT h.is_ill AND placed_gmt > timestamp '%s'""" % (unicode(last_timestamp)
 cursor.execute(q)
 rows = cursor.fetchall()
 
+cursor.close()
+conn.close()
+
 emails = {}
 
 for r in rows:
     if last_timestamp == None or unicode(r[1]) > last_timestamp:
         last_timestamp = unicode(r[1])
-    if r[2] in emails:
-        emails[r[2]].append((r[3].strip(" :/."), r[0],))
-    else:
-        emails[r[2]] = [(r[3].strip(" :/."), r[0],)]
+    if r[3] != None:
+        if r[2] in emails:
+            emails[r[2]].append((r[3].strip(" :/."), r[0],))
+        else:
+            emails[r[2]] = [(r[3].strip(" :/."), r[0],)]
 
 f = open("/usr/home/spl/holds_notices/last_holds_timestamp.txt", "w")
 f.write(unicode(last_timestamp))
 f.close()
 
 for email in emails:
-    sender = EMAIL_FROM
+    sender = 'circ@skokielibrary.info'
     receivers = [email]
 
-    message = """From: %s
+    message = """From: circ@skokielibrary.info
 To: %s
 Subject: Skokie Public Library Hold Confirmations
 
 Skokie Public Library has received your hold request. Please wait until you are notified by email/phone that your item (s) is ready to be picked up.
 
-""" % (sender, " ".join(receivers),)
+""" % " ".join(receivers)
 
     for info in emails[email]:
         message += "\t%s: http://encore.skokielibrary.info/iii/encore/record/C__Rb%s\n" % info
 
     try:
-        smtp = smtplib.SMTP(EMAIL_HOST)
+        smtp = smtplib.SMTP('analogy.skokie.lib.il.us')
         smtp.sendmail(sender, receivers, message)         
-    except SMTPException:
-        print "Error: unable to send email"
+    except smtplib.SMTPException:
+        print "Unable to send email: %s" % " ".join(receivers)
