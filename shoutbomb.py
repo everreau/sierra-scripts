@@ -126,7 +126,7 @@ renewals_q = """SELECT 'p' || rmp.record_num || 'a' AS patron_no,
   GROUP BY 1,2,3,4,5,6,7,10,11
   ORDER BY patron_no"""
 
-os.chdir("/usr/home/spl/shoutbomb/")
+os.chdir(SHOUTBOMB_DIR)
 os.system("mv holds*.txt archive/")
 os.system("mv overdue*.txt archive/")
 os.system("mv renew*.txt archive/")
