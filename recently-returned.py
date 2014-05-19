@@ -56,7 +56,7 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(FEED_DIR)
 
 for f in feeds:
     feed = feeds[f]

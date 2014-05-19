@@ -79,8 +79,8 @@ f.close()
 SUBJECT = "Civic Technologies Checkout Data File"
 
 msg = MIMEMultipart()
-msg["From"] = "everreau@skokielibrary.info"
-msg["To"] = "gshaw@skokielibrary.info"
+msg["From"] = CIVIC_FROM
+msg["To"] = CIVIC_TO
 msg["Subject"] = SUBJECT
 msg["Date"] = formatdate(localtime=True)
 

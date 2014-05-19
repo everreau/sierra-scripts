@@ -98,9 +98,12 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(FEEDS_DIR)
 
 for f in feeds:
     feed = feeds[f]
     write_rss(cursor, f, feed['title'], base_feed_q % ((joins[f] if f in joins else ""), feed['days'], where[f]))
+
+cursor.close()
+conn.close()
 

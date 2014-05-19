@@ -70,22 +70,22 @@ f.write(unicode(last_timestamp))
 f.close()
 
 for email in emails:
-    sender = 'circ@skokielibrary.info'
+    sender = CIRC_EMAIL
     receivers = [email]
 
-    message = """From: circ@skokielibrary.info
+    message = """From: %s
 To: %s
 Subject: Skokie Public Library Hold Confirmations
 
 Skokie Public Library has received your hold request. Please wait until you are notified by email/phone that your item (s) is ready to be picked up.
 
-""" % " ".join(receivers)
+""" % (sender, " ".join(receivers),)
 
     for info in emails[email]:
         message += "\t%s: http://encore.skokielibrary.info/iii/encore/record/C__Rb%s\n" % info
 
     try:
-        smtp = smtplib.SMTP('analogy.skokie.lib.il.us')
+        smtp = smtplib.SMTP(EMAIL_HOST)
         smtp.sendmail(sender, receivers, message)         
     except smtplib.SMTPException:
         print "Unable to send email: %s" % " ".join(receivers)

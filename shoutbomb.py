@@ -142,8 +142,8 @@ renewals_file = write_file(cursor, "renew%s.txt", renewals_titles, renewals_q)
 print ("created %s" % renewals_file)
 
 try:
-    sftp = FTP_TLS(FTP_HOST, FTP_USER, FTP_PASSWORD)
-    sftp.login(FTP_USER, FTP_PASSWORD)
+    sftp = FTP_TLS(SHOUTBOMB_HOST, SHOUTBOMB_USER, SHOUTBOMB_PASSWORD)
+    sftp.login(SHOUTBOMB_USER, SHOUTBOMB_PASSWORD)
     sftp.prot_p()
 
     put_file(sftp, holds_file, "/Holds/")

@@ -30,7 +30,10 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
-os.chdir(os.getcwd())
+os.chdir(FEEDS_DIR)
 
 for s in encore_searches:
     do_it(cursor, s, encore_searches[s] % ((joins[s] if s in joins else ""), where[s],))
+
+cursor.close()
+conn.close()
