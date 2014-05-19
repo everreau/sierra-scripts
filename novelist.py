@@ -1,5 +1,18 @@
 #!/usr/bin/python2.7
 #
+# Export collection for Novelist Select
+# FTP to their server
+# Notify someone it happened
+# 
+# settings to fill in:
+# DB_NAME, DB_HOST, DB_USER, DB_PASSWORD -- your sierra database
+# NOVELIST_HOST, NOVELIST_USER, NOVELIST_PASSWORD -- novelist's ftp server
+# NOVELIST_FROM -- who the notification should come from
+# NOVELIST_NOTIFICATION -- who should be notified the process completed (or failed)
+# EMAIL_HOST - your email host
+#
+# you should also update the file name and the upload directory in the script 
+#
 
 import psycopg2
 import datetime
