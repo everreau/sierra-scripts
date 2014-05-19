@@ -53,6 +53,10 @@ except psycopg2.Error as e:
 cursor = conn.cursor()
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+files = os.listdir(os.path.dirname(os.path.abspath(__file__)))
+for f in files:
+    if f.startswith("Skokie-3M-"):
+        os.remove(f)
 
 filename = ("Skokie-3M-%s-ISBNs.txt" % datetime.date.today().strftime("%Y%m%d"))
 
