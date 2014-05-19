@@ -58,7 +58,7 @@ except psycopg2.Error as e:
 
 cursor = conn.cursor()
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(CIVIC_DIR)
 
 filename = ("skokie_checkouts_%s.csv" % datetime.date.today().strftime("%Y%m%d"))
 
