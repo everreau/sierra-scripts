@@ -66,10 +66,14 @@ except psycopg2.Error as e:
 cursor = conn.cursor()
 
 os.chdir(NOVELIST_DIR)
-files = os.listdir(os.path.dirname(os.path.abspath(__file__)))
-for f in files:
-    if f.startswith("Skokie-3M-"):
-        os.remove(f)
+
+archive_limit = datetime.datetime.today() - datetime.timedelta(days=100)
+
+for f in os.listdir("."):
+    fullpath = os.path.abspath(f)
+    ctime = datetime.datetime.fromtimestamp(os.stat(fullpath).st_ctime)    
+    if ctime < archive_limit and f.endswith(".txt"):
+        os.remove(fullpath)
 
 filename = ("Skokie-3M-%s-ISBNs.txt" % datetime.date.today().strftime("%Y%m%d"))
 

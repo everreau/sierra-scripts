@@ -131,6 +131,14 @@ os.system("mv holds*.txt archive/")
 os.system("mv overdue*.txt archive/")
 os.system("mv renew*.txt archive/")
 
+archive_limit = datetime.datetime.today() - datetime.timedelta(days=30)
+
+for f in os.listdir("."):
+    fullpath = os.path.abspath("archive/" + f)
+    ctime = datetime.datetime.fromtimestamp(os.stat(fullpath).st_ctime)
+    if ctime < archive_limit and f.endswith(".txt"):
+        os.remove(fullpath)
+
 holds_file = write_file(cursor, "holds%s.txt", holds_titles, holds_q)
 print ("created %s" % holds_file)
 overdue_files = []

@@ -60,6 +60,14 @@ cursor = conn.cursor()
 
 os.chdir(CIVIC_DIR)
 
+archive_limit = datetime.datetime.today() - datetime.timedelta(days=60)
+
+for f in os.listdir("."):
+    fullpath = os.path.abspath(f)
+    ctime = datetime.datetime.fromtimestamp(os.stat(fullpath).st_ctime)
+    if ctime < archive_limit and f.endswith(".csv"):
+        os.remove(fullpath)
+
 filename = ("skokie_checkouts_%s.csv" % datetime.date.today().strftime("%Y%m%d"))
 
 cursor.execute(q)
