@@ -66,6 +66,7 @@ for f in os.listdir("."):
     fullpath = os.path.abspath(f)
     ctime = datetime.datetime.fromtimestamp(os.stat(fullpath).st_ctime)
     if ctime < archive_limit and f.endswith(".csv"):
+        print "deleting: " + fullpath
         os.remove(fullpath)
 
 filename = ("skokie_checkouts_%s.csv" % datetime.date.today().strftime("%Y%m%d"))

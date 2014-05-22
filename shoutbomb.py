@@ -7,7 +7,7 @@
 import os
 import psycopg2
 
-from datetime import date
+from datetime import date, datetime, timedelta
 from ftplib import  FTP_TLS
 
 from settings import *
@@ -131,12 +131,13 @@ os.system("mv holds*.txt archive/")
 os.system("mv overdue*.txt archive/")
 os.system("mv renew*.txt archive/")
 
-archive_limit = datetime.datetime.today() - datetime.timedelta(days=30)
+archive_limit = datetime.today() - timedelta(days=30)
 
-for f in os.listdir("."):
+for f in os.listdir("archive/"):
     fullpath = os.path.abspath("archive/" + f)
-    ctime = datetime.datetime.fromtimestamp(os.stat(fullpath).st_ctime)
+    ctime = datetime.fromtimestamp(os.stat(fullpath).st_ctime)
     if ctime < archive_limit and f.endswith(".txt"):
+        print "deleting: " + fullpath
         os.remove(fullpath)
 
 holds_file = write_file(cursor, "holds%s.txt", holds_titles, holds_q)
